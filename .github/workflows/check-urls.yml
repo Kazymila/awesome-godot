@@ -26,7 +26,7 @@ jobs:
           grep -oE 'https://www\.npmjs\.com/package/[a-zA-Z0-9@/._-]+' README.md | sort -u | while read -r url; do \
             echo -n "Checking $url... "; \
             registry=$(echo "$url" | sed 's#https://www\.npmjs\.com/package/#https://registry.npmjs.org/#g')
-            status=$(curl -w "%{http_code}" -o /dev/null -L "$url"); \
+            status=$(curl -w "%{http_code}" -o /dev/null -s -L "$registry"); \
             if [[ "$status" -eq 200 ]]; then
                 echo "Found!"; \
             else
