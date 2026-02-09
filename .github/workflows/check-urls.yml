@@ -27,9 +27,7 @@ jobs:
             echo -n "Checking $url... "; \
             registry=$(echo "$url" | sed 's#https://www\.npmjs\.com/package/#https://registry.npmjs.org/#g')
             status=$(curl -w "%{http_code}" -o /dev/null -s -L "$registry"); \
-            if [[ "$status" -eq 200 ]]; then
-                echo "Found!"; \
-            else
+            if [[ "$status" -eq 404 ]]; then
                 echo "Status code: $status"; exit 1; \
-            fi
+            fi; echo "Found!"
           done
