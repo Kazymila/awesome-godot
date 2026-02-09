@@ -25,10 +25,12 @@ jobs:
         run: |
           grep -oE 'https://www\.npmjs\.com/package/[a-zA-Z0-9@/._-]+' README.md | sort -u | while read -r url; do \
             echo -n "Checking $url... "; \
-            status=$(curl -s -o /dev/null -w "%{http_code}" --http1.1 -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36" "$url"); \
-            if [ "$status" -eq 200 ]; then
-              echo "Found!"; \
+            result=$(curl -w "%{http_code} %{url_effective}" -L "$url" --http1.1 -s -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36" -o /dev/null ); \
+            status=$(echo $result | cut -d' ' -f1); final_url=$(echo $result | cut -d' ' -f2); \
+            if [[ "$status" -eq 200 && ! "$final_url" == *"/login"* ]]; then
+                echo "Found!"; \
             else
-              echo "Status code: $status"; exit 1;
-            fi \
+                result=$(echo "$result" | sed 's/200/404/'); \
+                echo "Status code: $status"; exit 1; \
+            fi
           done
