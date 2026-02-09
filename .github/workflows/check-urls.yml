@@ -25,7 +25,7 @@ jobs:
         run: |
           grep -oE 'https://www\.npmjs\.com/package/[a-zA-Z0-9@/._-]+' README.md | sort -u | while read -r url; do \
             echo -n "Checking $url... "; \
-            result=$(curl -w "%{http_code} %{url_effective}" -L "$url" --http1.1 -s -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36" -o /dev/null ); \
+            result=$(curl -w "%{http_code} %{url_effective}" -L "$url" --http1.1 -s -A "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)" -o /dev/null ); \
             status=$(echo $result | cut -d' ' -f1); final_url=$(echo $result | cut -d' ' -f2); \
             if [[ "$status" -eq 200 && ! "$final_url" == *"/login"* ]]; then
                 echo "Found!"; \
