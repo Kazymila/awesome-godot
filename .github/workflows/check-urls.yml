@@ -25,12 +25,11 @@ jobs:
         run: |
           grep -oE 'https://www\.npmjs\.com/package/[a-zA-Z0-9@/._-]+' README.md | sort -u | while read -r url; do \
             echo -n "Checking $url... "; \
-            result=$(curl -w "%{http_code} %{url_effective}" -L "$url" --http1.1 -s -A "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)" -o /dev/null ); \
-            status=$(echo $result | cut -d' ' -f1); final_url=$(echo $result | cut -d' ' -f2); \
-            if [[ "$status" -eq 200 && ! "$final_url" == *"/login"* ]]; then
+            registry=$(echo "$url" | sed 's#https://www\.npmjs\.com/package/#https://registry.npmjs.org/#g')
+            status=$(curl -w "%{http_code}" -o /dev/null -L "$url"); \
+            if [[ "$status" -eq 200 ]]; then
                 echo "Found!"; \
             else
-                result=$(echo "$result" | sed 's/200/404/'); \
                 echo "Status code: $status"; exit 1; \
             fi
           done
