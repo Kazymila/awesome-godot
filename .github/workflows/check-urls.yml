@@ -20,3 +20,13 @@ jobs:
 
       - name: Fail if there were link errors
         run: exit ${{ steps.lc.outputs.exit_code }}
+
+      - name: Check npm packages manually
+        run: |
+          grep -oE 'https://www\.npmjs\.com/package/[a-zA-Z0-9@/._-]+' README.md | sort -u | while read -r url; do \
+            echo -n "Checking $url... "; \
+            status=$(curl -s -o /dev/null -w "%{http_code}" -L --http1.1 -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36" "$url"); \
+            if [ "$status" -eq 404 ]; then
+              exit 1; \
+            fi \
+          done
